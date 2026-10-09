@@ -1,0 +1,330 @@
+-- =============================================================================
+-- SCRIPT CORREGIDO Y OPTIMIZADO PARA ORACLE DATABASE
+-- Proyecto: Sistema Académico
+-- Requerimientos de especificación de datos aplicados
+-- =============================================================================
+
+-- -----------------------------------------------------------------------------
+-- 1. TABLA: ROL
+-- -----------------------------------------------------------------------------
+CREATE TABLE rol 
+    ( 
+     id_rol   NUMBER NOT NULL , 
+     nombre_r VARCHAR2 (50) NOT NULL 
+    ) 
+;
+
+ALTER TABLE rol 
+    ADD CONSTRAINT rol_PK PRIMARY KEY ( id_rol ) ;
+
+
+-- -----------------------------------------------------------------------------
+-- 2. TABLA: USUARIO
+-- -----------------------------------------------------------------------------
+CREATE TABLE usuario 
+    ( 
+     iduser     NUMBER NOT NULL , 
+     nombre     VARCHAR2 (50) NOT NULL , 
+     password   VARCHAR2 (50) NOT NULL , 
+     rol_id_rol NUMBER NOT NULL 
+    ) 
+;
+
+ALTER TABLE usuario 
+    ADD CONSTRAINT usuario_PK PRIMARY KEY ( iduser ) ;
+
+
+-- -----------------------------------------------------------------------------
+-- 3. TABLA: CARRERA
+-- -----------------------------------------------------------------------------
+CREATE TABLE carrera 
+    ( 
+     id_crra    NUMBER NOT NULL , 
+     nombrecrra VARCHAR2 (50) NOT NULL 
+    ) 
+;
+
+ALTER TABLE carrera 
+    ADD CONSTRAINT carrera_PK PRIMARY KEY ( id_crra ) ;
+
+
+-- -----------------------------------------------------------------------------
+-- 4. TABLA: PENSUM
+-- -----------------------------------------------------------------------------
+CREATE TABLE pensum 
+    ( 
+     id_psum         NUMBER NOT NULL , 
+     a_vigencia      NUMBER NOT NULL , 
+     carrera_id_crra NUMBER NOT NULL 
+    ) 
+;
+
+ALTER TABLE pensum 
+    ADD CONSTRAINT pensum_PK PRIMARY KEY ( id_psum ) ;
+
+
+-- -----------------------------------------------------------------------------
+-- 5. TABLA: CURSO
+-- -----------------------------------------------------------------------------
+CREATE TABLE curso 
+    ( 
+     id_cso         NUMBER NOT NULL , 
+     cod_cso        NUMBER NOT NULL , 
+     nombre         VARCHAR2 (50) NOT NULL , 
+     creditos       NUMBER NOT NULL , 
+     pensum_id_psum NUMBER NOT NULL 
+    ) 
+;
+
+ALTER TABLE curso 
+    ADD CONSTRAINT curso_PK PRIMARY KEY ( id_cso ) ;
+
+ALTER TABLE curso 
+    ADD CONSTRAINT CHK_curso_creditos CHECK ( creditos >= 0 ) ;
+
+
+-- -----------------------------------------------------------------------------
+-- 6. TABLA: DOCENTE
+-- -----------------------------------------------------------------------------
+CREATE TABLE docente 
+    ( 
+     id_dte         NUMBER NOT NULL , 
+     nombre         VARCHAR2 (50) NOT NULL , 
+     apellido       VARCHAR2 (50) NOT NULL , 
+     dpi            NUMBER NOT NULL , 
+     usuario_iduser NUMBER NOT NULL 
+    ) 
+;
+
+ALTER TABLE docente 
+    ADD CONSTRAINT docente_PK PRIMARY KEY ( id_dte ) ;
+
+
+-- -----------------------------------------------------------------------------
+-- 7. TABLA: ESTUDIANTE
+-- -----------------------------------------------------------------------------
+CREATE TABLE estudiante 
+    ( 
+     id_est         NUMBER NOT NULL , 
+     carnet         NUMBER NOT NULL , 
+     nombre         VARCHAR2 (50) NOT NULL , 
+     apellido       VARCHAR2 (50) NOT NULL , 
+     usuario_iduser NUMBER NOT NULL 
+    ) 
+;
+
+ALTER TABLE estudiante 
+    ADD CONSTRAINT estudiante_PK PRIMARY KEY ( id_est ) ;
+
+
+-- -----------------------------------------------------------------------------
+-- 8. TABLA: SECCION
+-- -----------------------------------------------------------------------------
+CREATE TABLE seccion 
+    ( 
+     id_sec         NUMBER NOT NULL , 
+     semestre       VARCHAR2 (50) NOT NULL , 
+     anio           NUMBER NOT NULL , 
+     curso_id_cso   NUMBER NOT NULL , 
+     docente_id_dte NUMBER NOT NULL 
+    ) 
+;
+
+ALTER TABLE seccion 
+    ADD CONSTRAINT seccion_PK PRIMARY KEY ( id_sec ) ;
+
+
+-- -----------------------------------------------------------------------------
+-- 9. TABLA: ASIGNACION_EST
+-- -----------------------------------------------------------------------------
+CREATE TABLE asignacion_est 
+    ( 
+     id_asig           NUMBER NOT NULL , 
+     fecha             DATE DEFAULT sysdate NOT NULL , 
+     seccion_id_sec    NUMBER NOT NULL , 
+     estudiante_id_est NUMBER NOT NULL 
+    ) 
+;
+
+ALTER TABLE asignacion_est 
+    ADD CONSTRAINT asignacion_est_PK PRIMARY KEY ( id_asig ) ;
+
+
+-- -----------------------------------------------------------------------------
+-- 10. TABLA: ASISTENCIA
+-- -----------------------------------------------------------------------------
+CREATE TABLE asistencia 
+    ( 
+     id_asis        NUMBER NOT NULL , 
+     fecha          DATE DEFAULT sysdate NOT NULL , 
+     estado         VARCHAR2 (50) NOT NULL , 
+     seccion_id_sec NUMBER NOT NULL , 
+     usuario_iduser NUMBER NOT NULL 
+    ) 
+;
+
+ALTER TABLE asistencia 
+    ADD CONSTRAINT asistencia_PK PRIMARY KEY ( id_asis ) ;
+
+
+-- -----------------------------------------------------------------------------
+-- 11. TABLA: NOTAS
+-- -----------------------------------------------------------------------------
+CREATE TABLE notas 
+    ( 
+     id_nota                NUMBER NOT NULL , 
+     zona                   NUMBER DEFAULT 0 NOT NULL , 
+     exam_f                 NUMBER DEFAULT 0 NOT NULL , 
+     nota_total             NUMBER DEFAULT 0 NOT NULL , 
+     asignacion_est_id_asig NUMBER NOT NULL 
+    ) 
+;
+
+ALTER TABLE notas 
+    ADD CONSTRAINT notas_PK PRIMARY KEY ( id_nota ) ;
+
+ALTER TABLE notas 
+    ADD CONSTRAINT CHK_notas_zona CHECK ( zona >= 0 ) ;
+
+ALTER TABLE notas 
+    ADD CONSTRAINT CHK_notas_exam_f CHECK ( exam_f >= 0 ) ;
+
+ALTER TABLE notas 
+    ADD CONSTRAINT CHK_notas_total CHECK ( nota_total >= 0 ) ;
+
+
+-- =============================================================================
+-- FOREIGN KEYS (LLAVES FORÁNEAS)
+-- =============================================================================
+
+ALTER TABLE asignacion_est 
+    ADD CONSTRAINT asignacion_est_estudiante_FK FOREIGN KEY 
+    ( 
+     estudiante_id_est
+    ) 
+    REFERENCES estudiante 
+    ( 
+     id_est
+    ) 
+;
+
+ALTER TABLE asignacion_est 
+    ADD CONSTRAINT asignacion_est_seccion_FK FOREIGN KEY 
+    ( 
+     seccion_id_sec
+    ) 
+    REFERENCES seccion 
+    ( 
+     id_sec
+    ) 
+;
+
+ALTER TABLE asistencia 
+    ADD CONSTRAINT asistencia_seccion_FK FOREIGN KEY 
+    ( 
+     seccion_id_sec
+    ) 
+    REFERENCES seccion 
+    ( 
+     id_sec
+    ) 
+;
+
+ALTER TABLE asistencia 
+    ADD CONSTRAINT asistencia_usuario_FK FOREIGN KEY 
+    ( 
+     usuario_iduser
+    ) 
+    REFERENCES usuario 
+    ( 
+     iduser
+    ) 
+;
+
+ALTER TABLE curso 
+    ADD CONSTRAINT curso_pensum_FK FOREIGN KEY 
+    ( 
+     pensum_id_psum
+    ) 
+    REFERENCES pensum 
+    ( 
+     id_psum
+    ) 
+;
+
+ALTER TABLE docente 
+    ADD CONSTRAINT docente_usuario_FK FOREIGN KEY 
+    ( 
+     usuario_iduser
+    ) 
+    REFERENCES usuario 
+    ( 
+     iduser
+    ) 
+;
+
+ALTER TABLE estudiante 
+    ADD CONSTRAINT estudiante_usuario_FK FOREIGN KEY 
+    ( 
+     usuario_iduser
+    ) 
+    REFERENCES usuario 
+    ( 
+     iduser
+    ) 
+;
+
+ALTER TABLE notas 
+    ADD CONSTRAINT notas_asignacion_est_FK FOREIGN KEY 
+    ( 
+     asignacion_est_id_asig
+    ) 
+    REFERENCES asignacion_est 
+    ( 
+     id_asig
+    ) 
+;
+
+ALTER TABLE pensum 
+    ADD CONSTRAINT pensum_carrera_FK FOREIGN KEY 
+    ( 
+     carrera_id_crra
+    ) 
+    REFERENCES carrera 
+    ( 
+     id_crra
+    ) 
+;
+
+ALTER TABLE seccion 
+    ADD CONSTRAINT seccion_curso_FK FOREIGN KEY 
+    ( 
+     curso_id_cso
+    ) 
+    REFERENCES curso 
+    ( 
+     id_cso
+    ) 
+;
+
+ALTER TABLE seccion 
+    ADD CONSTRAINT seccion_docente_FK FOREIGN KEY 
+    ( 
+     docente_id_dte
+    ) 
+    REFERENCES docente 
+    ( 
+     id_dte
+    ) 
+;
+
+ALTER TABLE usuario 
+    ADD CONSTRAINT usuario_rol_FK FOREIGN KEY 
+    ( 
+     rol_id_rol
+    ) 
+    REFERENCES rol 
+    ( 
+     id_rol
+    ) 
+;
