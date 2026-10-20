@@ -11,7 +11,7 @@ if ($rol === 'administrador') {
         ['modulos/secciones/listar.php',     'bi-diagram-3',       'Secciones'],
         ['modulos/asignaciones/listar.php',  'bi-link-45deg',      'Asignaciones'],
         ['modulos/asistencia/listar.php',    'bi-calendar-check',  'Asistencia'],
-        ['modulos/notas/consultar.php',      'bi-clipboard-data',  'Calificaciones'],
+        ['modulos/notas/registrar.php',      'bi-clipboard-data',  'Calificaciones'],
         ['modulos/busqueda/index.php',       'bi-search',          'Búsqueda'],
         ['modulos/informativo/index.php',    'bi-info-circle',     'Institucional'],
     ];
