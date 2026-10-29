@@ -46,9 +46,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $db->commit();
             header('Location: listar.php?msg=creado');
             exit;
+
         } catch (Exception $e) {
             $db->rollBack();
-            $error = $e->getMessage();
+            
+            // --- CAMBIO AQUÍ ---
+            // Atrapar el error de DPI duplicado (ORA-00001)
+            if (strpos($e->getMessage(), 'ORA-00001') !== false) {
+                $error = 'El DPI ingresado ya está registrado en otro docente. Por favor, verifica el número.';
+            } else {
+                $error = $e->getMessage();
+            }
+            // -------------------
         }
     }
 }

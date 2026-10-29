@@ -32,8 +32,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ]);
             header('Location: listar.php?msg=editado');
             exit;
-        } catch (Exception $e) {
-            $error = 'Error al actualizar: ' . $e->getMessage();
+            } catch (Exception $e) {
+            // Atrapar el error de carnet duplicado (ORA-00001)
+            if (strpos($e->getMessage(), 'ORA-00001') !== false) {
+                $error = 'El carnet ingresado ya está registrado en otro estudiante. Por favor, verifica el número.';
+            } else {
+                $error = 'Error al actualizar: ' . $e->getMessage();
+            }
         }
     }
 }

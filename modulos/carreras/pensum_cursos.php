@@ -49,8 +49,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ]);
             header('Location: pensum_cursos.php?id=' . $idPensum . '&msg=creado');
             exit;
-        } catch (Exception $e) {
-            $error = 'Error al guardar: ' . $e->getMessage();
+                } catch (Exception $e) {
+            // Verificamos si el error es por código duplicado (ORA-00001)
+            if (strpos($e->getMessage(), 'ORA-00001') !== false) {
+                $error = 'El código de curso ingresado ya está registrado en otra carrera. Por favor, usa un código diferente.';
+            } else {
+                $error = 'Ocurrió un error inesperado al guardar el curso.';
+            }
         }
     }
 }

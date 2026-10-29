@@ -32,8 +32,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ]);
             header('Location: listar.php?msg=editado');
             exit;
-        } catch (Exception $e) {
-            $error = 'Error al actualizar: ' . $e->getMessage();
+            } catch (Exception $e) {
+            // Atrapar el error de DPI duplicado (ORA-00001)
+            if (strpos($e->getMessage(), 'ORA-00001') !== false) {
+                $error = 'El DPI ingresado ya está registrado en otro docente. Por favor, verifica el número.';
+            } else {
+                $error = 'Error al actualizar: ' . $e->getMessage();
+            }
         }
     }
 }

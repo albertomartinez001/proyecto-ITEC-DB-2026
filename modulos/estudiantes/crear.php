@@ -18,21 +18,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         try {
             $db->beginTransaction();
 
-            // Verificar usuario único
+            // 1. Verificar usuario único
             $check = $db->prepare("SELECT COUNT(*) c FROM usuario WHERE nombre = :u");
             $check->execute([':u' => $usuario]);
             if ($check->fetch()['c'] > 0) {
                 throw new Exception('El nombre de usuario ya está en uso.');
             }
 
-            // 1) Insertar usuario (rol estudiante = 3)
+            // 2. Insertar usuario (rol estudiante = 3)
             $sqlU = "INSERT INTO usuario (iduser, nombre, password, rol_id_rol)
                      VALUES (seq_usuario.NEXTVAL, :n, :p, 3)";
             $db->prepare($sqlU)->execute([':n' => $usuario, ':p' => $password]);
 
             $idUser = $db->query("SELECT seq_usuario.CURRVAL AS id FROM dual")->fetch()['id'];
 
-            // 2) Insertar estudiante
+            // 3. Insertar estudiante
             $sqlE = "INSERT INTO estudiante (id_est, carnet, nombre, apellido, usuario_iduser)
                      VALUES (seq_estudiante.NEXTVAL, :car, :nom, :ape, :iduser)";
             $db->prepare($sqlE)->execute([
@@ -45,9 +45,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $db->commit();
             header('Location: listar.php?msg=creado');
             exit;
+
         } catch (Exception $e) {
-            $db->rollBack();
-            $error = $e->getMessage();
+            $db->rollBack(); // <--- ESTA LÍNEA FALTABA
+            
+            // Atrapar el error de carnet duplicado (ORA-00001)
+            if (strpos($e->getMessage(), 'ORA-00001') !== false) {
+                $error = 'El carnet ingresado ya está registrado. Por favor, verifica el número.';
+            } else {
+                $error = $e->getMessage();
+            }
         }
     }
 }

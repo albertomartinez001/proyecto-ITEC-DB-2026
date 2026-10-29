@@ -5,7 +5,7 @@ requerirRol(['administrador']); // Solo el admin ve todo el historial
 
 $db = Database::getInstance()->getConnection();
 
-$sql = "SELECT a.id_asig, a.fecha, 
+$sql = "SELECT a.id_asig, TO_CHAR(a.fecha, 'DD/MM/YYYY') AS fecha_formateada, 
                e.carnet, e.nombre AS est_nombre, e.apellido AS est_apellido,
                c.nombre AS curso, c.cod_cso,
                s.semestre, s.anio
@@ -14,8 +14,9 @@ $sql = "SELECT a.id_asig, a.fecha,
         JOIN seccion s ON s.id_sec = a.seccion_id_sec
         JOIN curso c ON c.id_cso = s.curso_id_cso
         ORDER BY a.fecha DESC, e.apellido";
-
 $asignaciones = $db->query($sql)->fetchAll();
+
+
 ?>
 
 <div class="d-flex justify-content-between align-items-center mb-3">
@@ -41,7 +42,7 @@ $asignaciones = $db->query($sql)->fetchAll();
             <?php if ($asignaciones): ?>
                 <?php foreach ($asignaciones as $a): ?>
                     <tr>
-                        <td><?= date('d/m/Y', strtotime($a['fecha'])) ?></td>
+                        <td><?= htmlspecialchars($a['fecha_formateada']) ?></td>
                         <td>
                             <span class="badge bg-secondary me-1"><?= htmlspecialchars($a['carnet']) ?></span>
                             <?= htmlspecialchars($a['est_apellido'] . ', ' . $a['est_nombre']) ?>
