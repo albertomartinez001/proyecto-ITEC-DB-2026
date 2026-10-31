@@ -30,7 +30,7 @@ if ($rol === 'administrador') {
 
     $metricas = [
         ['Mis Secciones', "SELECT COUNT(*) c FROM seccion WHERE docente_id_dte = $idDocente", 'bi-diagram-3', 'primary', 'modulos/secciones/listar.php'],
-        ['Mis Alumnos',   "SELECT COUNT(*) c FROM asignacion_est a JOIN seccion s ON s.id_sec = a.seccion_id_sec WHERE s.docente_id_dte = $idDocente", 'bi-people', 'success', '#'],
+        ['Mis Alumnos',   "SELECT COUNT(*) c FROM asignacion_est a JOIN seccion s ON s.id_sec = a.seccion_id_sec WHERE s.docente_id_dte = $idDocente", 'bi-people', 'success', 'modulos/secciones/listar.php'],
     ];
     $accesos = [
         ['Pasar Asistencia', 'modulos/asistencia/registrar.php', 'bi-calendar-check', 'outline-primary'],
